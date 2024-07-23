@@ -27,18 +27,51 @@ enum FilmType {
   }
 }
 
+enum FilmFormat {
+  UNDEFINED,
+  THIRTY_FIVE_MM,
+  ONE_TWENTY,
+  ONE_TWENTY_SEVEN,
+  ONE_TEN,
+  SHEET;
+
+  String toUserString() {
+    switch(this) {
+      case FilmFormat.UNDEFINED:
+        return "UNDEFINED";
+
+      case FilmFormat.THIRTY_FIVE_MM:
+        return "35mm";
+
+      case FilmFormat.ONE_TEN:
+        return "110";
+
+      case FilmFormat.ONE_TWENTY:
+        return "120";
+
+      case FilmFormat.ONE_TWENTY_SEVEN:
+        return "127";
+
+      case FilmFormat.SHEET:
+        return "Sheet Film";
+    }
+  }
+}
+
 
 class FilmStock{
   final String name;
   final String info;
   final int iso;
   final FilmType type;
+  final FilmFormat format;
 
   const FilmStock({
     required this.name,
     required this.info,
     required this.iso,
-    required this.type
+    required this.type,
+    required this.format
   });
 
   factory FilmStock.fromJson (Map<String, dynamic> json) {
@@ -46,7 +79,8 @@ class FilmStock{
       name: json["name"],
       info: json["development_info"],
       iso: json["iso"],
-      type: FilmType.values[json["type"]]
+      type: FilmType.values[json["type"]],
+      format: FilmFormat.values[json["format"]]
     );
   }
 
@@ -69,7 +103,8 @@ class FilmStock{
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("ISO $iso", style: const TextStyle(fontSize: 12)),
-                Text("Type ${type.toUserString()}", style: const TextStyle(fontSize: 12))
+                Text("Type ${type.toUserString()}", style: const TextStyle(fontSize: 12)),
+                Text("Format ${format.toUserString()}", style: const TextStyle(fontSize: 12))
               ],
             )
           ],
@@ -85,7 +120,8 @@ FilmStock: {
   "name": "$name",
   "iso": $iso,
   "info": $info,
-  "type": $type
+  "type": $type,
+  "format": $format
 }
     """;
   }

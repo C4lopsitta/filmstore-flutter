@@ -18,12 +18,14 @@ class CreateFilmstock extends StatefulWidget {
 class _CreateFilmstock extends State<CreateFilmstock> {
   bool saving = false;
   int selectedType = 1;
+  int selectedFormat = 1;
 
   TextEditingController name = TextEditingController();
   TextEditingController iso = TextEditingController();
   TextEditingController info = TextEditingController();
 
   List<DropdownMenuEntry<int>> types = [];
+  List<DropdownMenuEntry<int>> formats = [];
 
   @override
   void initState() {
@@ -31,6 +33,12 @@ class _CreateFilmstock extends State<CreateFilmstock> {
     FilmType.values.forEach((type) {
       if(type != FilmType.UNDEFINED)
         types.add(DropdownMenuEntry(value: type.index, label: type.toUserString()));
+    });
+
+    FilmFormat.values.forEach((format) {
+      if(format != FilmFormat.UNDEFINED) {
+        formats.add(DropdownMenuEntry(value: format.index, label: format.toUserString()));
+      }
     });
   }
 
@@ -52,7 +60,8 @@ class _CreateFilmstock extends State<CreateFilmstock> {
               "name": "${name.text}",
               "iso": ${iso.text},
               "development_info": "${info.text}",
-              "type": $selectedType
+              "type": $selectedType,
+              "format": $selectedFormat
             }
             """
           ).then((result) {
@@ -82,18 +91,31 @@ class _CreateFilmstock extends State<CreateFilmstock> {
               child: TextField(
                 controller: iso,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    label: Text("ISO")
+                  border: OutlineInputBorder(),
+                  label: Text("ISO"),
                 ),
+                keyboardType: TextInputType.number,
+                autofillHints: const [
+                  "12", "25", "100", "125", "200", "400", "800", "1600", "3200"
+                ],
               )),
               const SizedBox(width: 13),
               DropdownMenu(
                 initialSelection: 1,
-                onSelected: (value) { selectedType = value ?? 1; },
-                dropdownMenuEntries: types,
+                onSelected: (value) { selectedFormat = value ?? 1; },
+                dropdownMenuEntries: formats,
                 width: MediaQuery.sizeOf(context).width * 0.5,
+                label: const Text("Format"),
               )
             ],
+          ),
+          const SizedBox(height: 12),
+          DropdownMenu(
+            initialSelection: 1,
+            onSelected: (value) { selectedType = value ?? 1; },
+            dropdownMenuEntries: types,
+            width: MediaQuery.sizeOf(context).width - 25,
+            label: const Text("Emulsion Type"),
           ),
           const SizedBox(height: 12),
           TextField(

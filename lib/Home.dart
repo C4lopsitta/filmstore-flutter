@@ -31,12 +31,7 @@ class Home extends StatefulWidget {
       films.forEach((filmroll) {
         Map<String ,dynamic> filmjson = filmroll["film"];
 
-        FilmStock film = FilmStock(
-            name: filmjson["name"],
-            info: filmjson["development_info"],
-            iso: filmjson["iso"],
-            type: FilmType.values[filmjson["type"]]
-        );
+        FilmStock film = FilmStock.fromJson(filmjson);
 
         FilmRoll stock = FilmRoll(
           film: film,

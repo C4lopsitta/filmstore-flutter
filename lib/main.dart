@@ -50,7 +50,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
             tooltip: "Create film roll",
             icon: const Icon(Icons.add_rounded),
             label: const Text("New Film Roll")
-        ) :
+        ) : (currentPageIndex == 1) ?
         FloatingActionButton.extended(
             onPressed: () {
               Navigator.push(
@@ -61,7 +61,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
             tooltip: "Add new stock",
             icon: const Icon(Icons.add_rounded),
             label: const Text("New Stock"),
-        ),
+        ) : null,
         body: [
           Home(),
           Brands(),

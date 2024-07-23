@@ -55,10 +55,12 @@ class _Brands extends State<Brands> {
 
   @override
   Widget build(BuildContext context) {
-    return (widget.error == null) ? Column(
-      children: <Widget>[
-        SizedBox(height: MediaQuery.of(context).viewPadding.top)
-      ] + widget.filmstocks_cards,
+    return (widget.error == null) ? SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: MediaQuery.of(context).viewPadding.top)
+        ] + widget.filmstocks_cards,
+      )
     ) : Column(
       children: [
         SizedBox(height: MediaQuery.of(context).viewPadding.top),
