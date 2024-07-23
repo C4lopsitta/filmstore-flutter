@@ -3,7 +3,7 @@ import 'package:filmstore/routes/create_filmroll.dart';
 import 'package:filmstore/routes/create_filmstock.dart';
 import 'package:flutter/material.dart';
 
-import 'Brands.dart';
+import 'Stocks.dart';
 import 'Home.dart';
 
 void main() {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'Entities/FilmStock.dart';
+import 'api.dart';
 
 class Brands extends StatefulWidget {
   List<FilmStock> filmstocks = [];
@@ -12,37 +13,28 @@ class Brands extends StatefulWidget {
 
 
   void getStocks(void Function() update) async {
-    await http.get(Uri.parse("http://192.168.1.7:4200/films")).then((response) {
-      Map<String, dynamic> json = jsonDecode(response.body);
+    error = null;
+    update();
 
-      if(json["status"] != 200) {
-        error = json["message"];
+    try {
+      Api.globalStocks = null;
+      Api.getFilmstocks().then((stocks) {
+        if(stocks.isEmpty) error = "No stock available";
+        Api.globalStocks = stocks.toSet();
+
+        for (var stock in stocks) {
+          filmstocks_cards.add(stock.build());
+          filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+        }
         update();
-        return;
-      }
-      error = null;
-      update();
-
-      List<dynamic> films = json["films"];
-
-      filmstocks = [];
-      filmstocks_cards = [];
-
-      films.forEach((film) {
-        FilmStock stock = FilmStock(
-            name: film["name"],
-            info: film["development_info"],
-            iso: film["iso"],
-            type: FilmType.values[film["type"]]
-        );
-
-        filmstocks_cards.add(stock.build());
-        filmstocks.add(stock);
-        filmstocks_cards.add(const Padding( padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
       });
-
+    } on ApiException catch (ex) {
+      error = ex.message;
+    } catch (ex) {
+      error = ex.toString();
+    } finally {
       update();
-    });
+    }
   }
 
   @override
@@ -53,10 +45,13 @@ class _Brands extends State<Brands> {
   @override
   void initState() {
     super.initState();
-
-    widget.getStocks(() => setState(() {}));
   }
 
+  @override
+  void didChangeDependencies() {
+    widget.getStocks(() => setState(() {}));
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +62,7 @@ class _Brands extends State<Brands> {
     ) : Column(
       children: [
         SizedBox(height: MediaQuery.of(context).viewPadding.top),
-        Text(widget.error ?? "")
+        Text(widget.error ?? "Porcoddio")
       ],
     );
   }

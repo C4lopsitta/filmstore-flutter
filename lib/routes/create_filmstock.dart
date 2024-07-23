@@ -7,6 +7,8 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
+import '../api.dart';
+
 class CreateFilmstock extends StatefulWidget {
 
   @override
@@ -15,7 +17,7 @@ class CreateFilmstock extends StatefulWidget {
 
 class _CreateFilmstock extends State<CreateFilmstock> {
   bool saving = false;
-  int selectedType = 0;
+  int selectedType = 1;
 
   TextEditingController name = TextEditingController();
   TextEditingController iso = TextEditingController();
@@ -44,7 +46,7 @@ class _CreateFilmstock extends State<CreateFilmstock> {
           setState(() {});
 
           http.post(
-            Uri.parse("http://192.168.1.7:4200/films"),
+            await Api.buildUri("/films"),
             body: """
             {
               "name": "${name.text}",
@@ -55,13 +57,12 @@ class _CreateFilmstock extends State<CreateFilmstock> {
             """
           ).then((result) {
             if(result.statusCode != 200) {
-
             } else {
               Navigator.pop(context);
             }
           });
         },
-        child: const Icon(Icons.save_rounded),
+        child: (saving) ? const CircularProgressIndicator() : const Icon(Icons.save_rounded),
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -69,9 +70,9 @@ class _CreateFilmstock extends State<CreateFilmstock> {
         children: [
           TextField(
             controller: name,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              label: (saving) ? const CircularProgressIndicator() : const Text("Name")
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text("Name")
             ),
           ),
           const SizedBox(height: 12),

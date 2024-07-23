@@ -41,6 +41,15 @@ class FilmStock{
     required this.type
   });
 
+  factory FilmStock.fromJson (Map<String, dynamic> json) {
+    return FilmStock(
+      name: json["name"],
+      info: json["development_info"],
+      iso: json["iso"],
+      type: FilmType.values[json["type"]]
+    );
+  }
+
 
   Widget build() {
     return GestureDetector(
@@ -67,5 +76,17 @@ class FilmStock{
         ),
       )
     );
+  }
+
+  @override
+  String toString() {
+    return """
+FilmStock: {
+  "name": "$name",
+  "iso": $iso,
+  "info": $info,
+  "type": $type
+}
+    """;
   }
 }
