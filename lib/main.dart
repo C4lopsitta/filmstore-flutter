@@ -1,3 +1,4 @@
+import 'package:filmstore/Settings.dart';
 import 'package:filmstore/routes/create_filmroll.dart';
 import 'package:filmstore/routes/create_filmstock.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,8 @@ class _ApplicationRoot extends State<ApplicationRoot> {
         ),
         body: [
           Home(),
-          Brands()
+          Brands(),
+          Settings()
         ][currentPageIndex],
 
         bottomNavigationBar: GestureDetector(
@@ -81,6 +83,11 @@ class _ApplicationRoot extends State<ApplicationRoot> {
               NavigationDestination(
                 icon: Icon(Icons.camera_roll_outlined),
                 selectedIcon: Icon(Icons.camera_roll_rounded),
+                label: "Film Stocks",
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.settings_outlined),
+                selectedIcon: Icon(Icons.settings_rounded),
                 label: "Film Stocks",
               ),
             ],
