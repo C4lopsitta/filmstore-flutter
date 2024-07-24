@@ -99,6 +99,7 @@ class FilmStock{
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
           children: [
             Text(name,
               style: const TextStyle(fontSize: 16)),
@@ -107,8 +108,8 @@ class FilmStock{
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("ISO $iso", style: const TextStyle(fontSize: 12)),
-                Text("Type ${type.toUserString()}", style: const TextStyle(fontSize: 12)),
-                Text("Format ${format.toUserString()}", style: const TextStyle(fontSize: 12))
+                Text("Type: ${type.toUserString()}", style: const TextStyle(fontSize: 12)),
+                Text("Format: ${format.toUserString()}", style: const TextStyle(fontSize: 12))
               ],
             )
           ],

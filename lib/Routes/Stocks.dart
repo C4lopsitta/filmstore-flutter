@@ -15,6 +15,7 @@ class Stocks extends StatefulWidget {
 
   void getStocks(void Function() update) async {
     error = null;
+    filmstocks_cards = [];
     update();
 
     try {
@@ -80,6 +81,14 @@ class _Stocks extends State<Stocks> {
                     for (FilmStock stock in Api.globalStocks ?? [])
                       if (stock.type == FilmType.values[selection])
                         widget.filmstocks_cards.add(stock.build(context));
+                    if(widget.filmstocks_cards.isEmpty)
+                      widget.filmstocks_cards.add(SizedBox(
+                        width: MediaQuery.sizeOf(context).width,
+                        height: MediaQuery.sizeOf(context).height - 140,
+                        child: Center(
+                          child: Text("No Stock with this type")
+                        )
+                      ));
                   }
                   setState(() {});
                 },
