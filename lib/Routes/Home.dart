@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:filmstore/Entities/FilmStock.dart';
 import 'package:flutter/material.dart';
-import './Entities/Filmroll.dart';
+import '../Entities/Filmroll.dart';
 import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {

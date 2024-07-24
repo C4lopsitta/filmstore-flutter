@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'Entities/FilmStock.dart';
-import 'api.dart';
+import '../Entities/FilmStock.dart';
+import '../api.dart';
 
-class Brands extends StatefulWidget {
+class Stocks extends StatefulWidget {
   List<FilmStock> filmstocks = [];
   List<Widget> filmstocks_cards = [];
   String? error;
+  BuildContext? context;
 
 
   void getStocks(void Function() update) async {
@@ -23,7 +24,7 @@ class Brands extends StatefulWidget {
         Api.globalStocks = stocks.toSet();
 
         for (var stock in stocks) {
-          filmstocks_cards.add(stock.build());
+          filmstocks_cards.add(stock.build(context!));
           filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
         }
         update();
@@ -38,10 +39,10 @@ class Brands extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => _Brands();
+  State<StatefulWidget> createState() => _Stocks();
 }
 
-class _Brands extends State<Brands> {
+class _Stocks extends State<Stocks> {
   @override
   void initState() {
     super.initState();
@@ -55,17 +56,25 @@ class _Brands extends State<Brands> {
 
   @override
   Widget build(BuildContext context) {
-    return (widget.error == null) ? SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          SizedBox(height: MediaQuery.of(context).viewPadding.top)
-        ] + widget.filmstocks_cards,
+    widget.context = context;
+
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height,
+      width: MediaQuery.sizeOf(context).width,
+      child: RefreshIndicator(
+        onRefresh: () async => widget.getStocks(() => setState(() {})),
+        child: (widget.error == null) ? SingleChildScrollView(
+          child: Column(
+          children: <Widget>[
+            SizedBox(height: MediaQuery.of(context).viewPadding.top)
+          ] + widget.filmstocks_cards,
+        )) : Column(
+          children: [
+            SizedBox(height: MediaQuery.of(context).viewPadding.top),
+            Text(widget.error ?? "Porcoddio")
+          ],
+        )
       )
-    ) : Column(
-      children: [
-        SizedBox(height: MediaQuery.of(context).viewPadding.top),
-        Text(widget.error ?? "Porcoddio")
-      ],
     );
   }
 }

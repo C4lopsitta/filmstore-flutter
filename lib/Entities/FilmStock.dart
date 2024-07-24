@@ -1,3 +1,4 @@
+import 'package:filmstore/routes/details_filmstock.dart';
 import 'package:flutter/material.dart';
 
 enum FilmType {
@@ -85,10 +86,10 @@ class FilmStock{
   }
 
 
-  Widget build() {
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-
+        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => FilmStockDetails(stock: this)));
       },
       child: Padding(
         padding: const EdgeInsets.all(12),
