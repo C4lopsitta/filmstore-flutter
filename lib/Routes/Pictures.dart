@@ -15,14 +15,17 @@ class _Pictures extends State<Pictures> {
 
     @override
     Widget build(BuildContext context) {
-        return Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            SizedBox(height: MediaQuery.of(context).viewPadding.top),
-            const Center(
-              child: Text("Future addition")
-            )
-          ],
+        return SizedBox(
+          height: MediaQuery.sizeOf(context).height,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              SizedBox(height: MediaQuery.of(context).viewPadding.top),
+              const Center(
+                child: Text("Future addition as API currently does not support feature")
+              )
+            ],
+          )
         );
     }
 }

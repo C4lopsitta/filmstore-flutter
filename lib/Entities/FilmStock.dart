@@ -66,13 +66,15 @@ class FilmStock{
   final int iso;
   final FilmType type;
   final FilmFormat format;
+  final int dbId;
 
   const FilmStock({
     required this.name,
     required this.info,
     required this.iso,
     required this.type,
-    required this.format
+    required this.format,
+    required this.dbId
   });
 
   factory FilmStock.fromJson (Map<String, dynamic> json) {
@@ -81,7 +83,8 @@ class FilmStock{
       info: json["development_info"],
       iso: json["iso"],
       type: FilmType.values[json["type"]],
-      format: FilmFormat.values[json["format"]]
+      format: FilmFormat.values[json["format"]],
+      dbId: json["id"]
     );
   }
 

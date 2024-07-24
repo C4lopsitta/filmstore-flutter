@@ -1,34 +1,29 @@
 import 'dart:convert';
 
+import 'package:filmstore/Entities/FilmStock.dart';
 import 'package:flutter/material.dart';
+import '../Entities/FilmRoll.dart';
 import 'package:http/http.dart' as http;
 
-import '../Entities/FilmStock.dart';
 import '../api.dart';
 
-class Stocks extends StatefulWidget {
-  List<FilmStock> filmstocks = [];
-  List<Widget> filmstocks_cards = [];
+class Rolls extends StatefulWidget {
+  List<Widget> filmrolls_cards = [];
+
   String? error;
-  BuildContext? context;
 
-
-  void getStocks(void Function() update) async {
-    error = null;
-    update();
-
+  void getFilmRolls(void Function() update) async {
     try {
-      Api.globalStocks = null;
-      Api.getFilmStocks().then((stocks) {
-        if(stocks.isEmpty) error = "No stock available";
-        Api.globalStocks = stocks.toSet();
+      Api.globalRolls = null;
+      error = null;
+      update();
+      Api.globalRolls = (await Api.getFilmRolls()).toSet();
 
-        for (var stock in stocks) {
-          filmstocks_cards.add(stock.build(context!));
-          filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
-        }
-        update();
-      });
+      if(Api.globalRolls!.isEmpty) throw ApiException(statusCode: 200, apiError: "No Rolls available");
+
+      for(FilmRoll roll in Api.globalRolls!) {
+        filmrolls_cards.add(roll.build());
+      }
     } on ApiException catch (ex) {
       error = ex.apiError;
     } catch (ex) {
@@ -39,10 +34,10 @@ class Stocks extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => _Stocks();
+  State<StatefulWidget> createState() => _Rolls();
 }
 
-class _Stocks extends State<Stocks> {
+class _Rolls extends State<Rolls> {
   @override
   void initState() {
     super.initState();
@@ -50,24 +45,23 @@ class _Stocks extends State<Stocks> {
 
   @override
   void didChangeDependencies() {
-    widget.getStocks(() => setState(() {}));
+    widget.getFilmRolls(() => setState(() {}));
     super.didChangeDependencies();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    widget.context = context;
-
     return SizedBox(
       height: MediaQuery.sizeOf(context).height,
       width: MediaQuery.sizeOf(context).width,
       child: RefreshIndicator(
-        onRefresh: () async => widget.getStocks(() => setState(() {})),
+        onRefresh: () async => widget.getFilmRolls(() => setState(() {})),
         child: (widget.error == null) ? SingleChildScrollView(
           child: Column(
           children: <Widget>[
             SizedBox(height: MediaQuery.of(context).viewPadding.top)
-          ] + widget.filmstocks_cards,
+          ] + widget.filmrolls_cards,
         )) : Column(
           children: [
             SizedBox(height: MediaQuery.of(context).viewPadding.top),

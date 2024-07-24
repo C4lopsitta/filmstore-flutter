@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'Routes/Pictures.dart';
 import 'Routes/Stocks.dart';
-import 'Routes/Home.dart';
+import 'Routes/Rolls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -64,7 +64,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
             label: const Text("New Stock"),
         ) : null,
         body: [
-          Home(),
+          Rolls(),
           Stocks(),
           Pictures(),
           const Settings()
