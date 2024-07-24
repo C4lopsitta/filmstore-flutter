@@ -54,7 +54,7 @@ class _CreateFilmstock extends State<CreateFilmstock> {
           setState(() {});
 
           http.post(
-            await Api.buildUri("/films"),
+            await Api.buildUri("/api/v1/films"),
             body: """
             {
               "name": "${name.text}",

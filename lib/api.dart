@@ -15,7 +15,7 @@ class Api {
   /// Raises a [ApiException] if an issue is encountered.
   static Future<List<FilmStock>> getFilmStocks() async {
     List<FilmStock> stocks = [];
-    Uri uri = await buildUri("/films");
+    Uri uri = await buildUri("/api/v1/films");
 
     http.Response response = await http.get(uri);
 
@@ -39,7 +39,7 @@ class Api {
   }
 
   static Future<bool> testApiAddress() async {
-    http.Response response = await http.get(await buildUri(""));
+    http.Response response = await http.get(await buildUri("/api/v1"));
 
     if(response.statusCode == 200) return true;
     return false;
@@ -47,7 +47,7 @@ class Api {
 
   static Future<List<FilmRoll>> getFilmRolls() async {
     List<FilmRoll> rolls = [];
-    Uri uri = await buildUri("/filmrolls");
+    Uri uri = await buildUri("/api/v1/filmrolls");
 
     http.Response response = await http.get(uri);
 
@@ -65,6 +65,11 @@ class Api {
     return rolls;
   }
 
+  static Future<bool> createFilmRoll(FilmRoll roll) async {
+    http.Response response = http.post(
+      await buildUri("");
+    );
+  }
 
   /// Checks if API returns a 200.
   /// 
