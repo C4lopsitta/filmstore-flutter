@@ -93,13 +93,20 @@ class FilmRoll {
           children: [
             Text(film.name,
               style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.camera_alt_rounded, size: 16),
+                const SizedBox(width: 6),
+                Text(camera, style: const TextStyle(fontSize: 12))
+              ],
+            ),
+            const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(camera, style: const TextStyle(fontSize: 12)),
                 Text(status.toUserString(), style: const TextStyle(fontSize: 12)),
-                Text("AID: $identifier", style: const TextStyle(fontSize: 12)),
+                Text("ID: $identifier", style: const TextStyle(fontSize: 12)),
                 Text("${picturesId.length} scanned", style: const TextStyle(fontSize: 12))
               ],
             )

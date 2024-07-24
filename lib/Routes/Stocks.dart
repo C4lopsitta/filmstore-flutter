@@ -72,12 +72,16 @@ class _Stocks extends State<Stocks> {
                 onSelected: (int selection, String selected) {
                   widget.filmstocks_cards = [];
                   if(selection == 0) {
-                    for (FilmStock stock in Api.globalStocks ?? [])
+                    for (FilmStock stock in Api.globalStocks ?? []) {
                       widget.filmstocks_cards.add(stock.build(context));
+                      widget.filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+                    }
                   } else {
                     for (FilmStock stock in Api.globalStocks ?? [])
-                      if (stock.type == FilmType.values[selection])
+                      if (stock.type == FilmType.values[selection]) {
                         widget.filmstocks_cards.add(stock.build(context));
+                        widget.filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+                      }
                     if(widget.filmstocks_cards.isEmpty)
                       widget.filmstocks_cards.add(SizedBox(
                         width: MediaQuery.sizeOf(context).width,

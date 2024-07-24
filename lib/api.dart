@@ -66,9 +66,23 @@ class Api {
   }
 
   static Future<bool> createFilmRoll(FilmRoll roll) async {
-    http.Response response = http.post(
-      await buildUri("");
+    http.Response response = await http.post(
+      await buildUri("/api/v1/filmrolls"),
+      body: """
+      {
+        "camera": "${roll.camera}",
+        "film": ${roll.film.dbId},
+        "identifier": "${roll.identifier}",
+        "pictures": ${roll.picturesId.toString()},
+        "status": ${roll.status.index}
+      }
+      """,
+      encoding: utf8
     );
+
+    if(response.statusCode >= 200 && response.statusCode < 300) return true;
+    Map<String, dynamic> json = jsonDecode(response.body);
+    throw ApiException(statusCode: response.statusCode, apiError: json["message"] ?? "Something really weird just happened");
   }
 
   /// Checks if API returns a 200.

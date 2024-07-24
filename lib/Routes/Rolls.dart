@@ -20,11 +20,12 @@ class Rolls extends StatefulWidget {
 
       for(FilmRoll roll in Api.globalRolls!) {
         filmrolls_cards.add(roll.build());
+        filmrolls_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
       }
-    } on ApiException catch (ex) {
+    } on ApiException catch (ex, st) {
       error = ex.apiError;
-    } catch (ex) {
-      error = ex.toString();
+    } catch (ex, st) {
+      error = ex.toString() + "\n" + st.toString();
     } finally {
       update();
     }
@@ -65,12 +66,16 @@ class _Rolls extends State<Rolls> {
                   onSelected: (int selection, String selected) {
                     widget.filmrolls_cards = [];
                     if(selection == 0) {
-                      for (FilmRoll roll in Api.globalRolls ?? [])
+                      for (FilmRoll roll in Api.globalRolls ?? []) {
                         widget.filmrolls_cards.add(roll.build());
+                        widget.filmrolls_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+                      }
                     } else {
                       for (FilmRoll roll in Api.globalRolls ?? [])
-                        if (roll.status == FilmStatus.values[selection])
+                        if (roll.status == FilmStatus.values[selection]) {
                           widget.filmrolls_cards.add(roll.build());
+                          widget.filmrolls_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+                        }
                       if(widget.filmrolls_cards.isEmpty)
                         widget.filmrolls_cards.add(SizedBox(
                           width: MediaQuery.sizeOf(context).width,
