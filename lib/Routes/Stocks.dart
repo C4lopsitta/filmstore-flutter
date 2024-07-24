@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:filmstore/components/filter_chip_row.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -7,7 +8,6 @@ import '../Entities/FilmStock.dart';
 import '../api.dart';
 
 class Stocks extends StatefulWidget {
-  List<FilmStock> filmstocks = [];
   List<Widget> filmstocks_cards = [];
   String? error;
   BuildContext? context;
@@ -66,7 +66,25 @@ class _Stocks extends State<Stocks> {
         child: (widget.error == null) ? SingleChildScrollView(
           child: Column(
           children: <Widget>[
-            SizedBox(height: MediaQuery.of(context).viewPadding.top)
+            SizedBox(height: MediaQuery.of(context).viewPadding.top),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
+              child: FilterChipRow(
+                filters: const ["All", "B/W Pan", "B/W Ortho", "Color", "Infrared"],
+                onSelected: (int selection, String selected) {
+                  widget.filmstocks_cards = [];
+                  if(selection == 0) {
+                    for (FilmStock stock in Api.globalStocks ?? [])
+                      widget.filmstocks_cards.add(stock.build(context));
+                  } else {
+                    for (FilmStock stock in Api.globalStocks ?? [])
+                      if (stock.type == FilmType.values[selection])
+                        widget.filmstocks_cards.add(stock.build(context));
+                  }
+                  setState(() {});
+                },
+              )
+            )
           ] + widget.filmstocks_cards,
         )) : Column(
           children: [
