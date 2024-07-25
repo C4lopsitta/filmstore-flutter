@@ -48,45 +48,54 @@ class _ApplicationRoot extends State<ApplicationRoot> {
   @override
   void initState() {
     super.initState();
+
     fetchData();
   }
 
-  void fetchData() async {
-    try {
-      Api.globalStocks = (await Api.getFilmStocks()).toSet();
-      Api.globalRolls = await Api.getFilmRolls();
 
-      for(FilmRoll roll in Api.globalRolls!) {
-        filmRollCards.add(roll.build());
-        filmRollCards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
-      }
+  Future<void> fetchRolls() async {
+    Api.globalRolls = await Api.getFilmRolls();
+
+    for(FilmRoll roll in Api.globalRolls!) {
+      filmRollCards.add(roll.build());
+      filmRollCards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+    }
+  }
+
+  Future<void> fetchStocks() async {
+      Api.globalStocks = (await Api.getFilmStocks()).toSet();
 
       for(FilmStock stock in Api.globalStocks!) {
         filmStockCards.add(stock.build(context));
         filmStockCards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
       }
+  }
 
+  void fetchData() async {
+    try {
+      await fetchRolls();
+      await fetchStocks();
       setState(() {});
     } on ApiException catch (ex) {
       contextualErrorDialogShower(
-        context,
-        const Icon(Icons.warning_rounded),
-        const Text("API Error"),
-        Text(ex.apiError)
+          context,
+          const Icon(Icons.warning_rounded),
+          const Text("API Error"),
+          Text(ex.apiError)
       );
     } on ClientException catch (ex) {
       contextualErrorDialogShower(
-        context,
-        const Icon(Icons.warning_rounded),
-        const Text("Network Error"),
-        Text(ex.message)
+          context,
+          const Icon(Icons.warning_rounded),
+          const Text("Network Error"),
+          Text(ex.message)
       );
     } catch (ex) {
       contextualErrorDialogShower(
-        context,
-        const Icon(Icons.warning_rounded),
-        const Text("Error"),
-        Text(ex.toString())
+          context,
+          const Icon(Icons.warning_rounded),
+          const Text("Error"),
+          Text(ex.toString())
       );
     }
   }
@@ -100,7 +109,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => CreateFilmroll())).then((value) async {
-                  Api.globalRolls = await Api.getFilmRolls();
+                  await fetchRolls();
                   setState(() {});
               });
             },
@@ -113,7 +122,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
               Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => CreateFilmstock())).then((value) async {
-                    Api.globalStocks = (await Api.getFilmStocks()).toSet();
+                    await fetchStocks();
                     setState(() {});
               });
             },
