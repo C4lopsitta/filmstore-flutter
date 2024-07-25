@@ -15,13 +15,14 @@ class CreateFilmroll extends StatefulWidget {
 }
 
 class _CreateFilmroll extends State<CreateFilmroll> {
-  TextEditingController camera = TextEditingController();
+  late TextEditingController camera;
   TextEditingController identifier = TextEditingController();
   int status = 1;
   int selectedFilmDBId = 0;
 
   List<DropdownMenuEntry> statuses = [];
   List<DropdownMenuEntry> filmStocks = [];
+  Set<String> cameraSuggestions = {};
 
   @override
   void initState() {
@@ -33,6 +34,10 @@ class _CreateFilmroll extends State<CreateFilmroll> {
     }
 
     filmStocks.add(const DropdownMenuEntry(value: -1, label: "Select a film stock"));
+
+    for(FilmRoll roll in Api.globalRolls ?? []) {
+      cameraSuggestions.add(roll.camera);
+    }
   }
 
   @override
@@ -89,7 +94,7 @@ class _CreateFilmroll extends State<CreateFilmroll> {
     for(FilmStock stock in Api.globalStocks!) {
       filmStocks.add(DropdownMenuEntry(
         value: stock.dbId,
-        label: "",
+        label: stock.name,
         labelWidget:stock.toMenuEntry()),
       );
     }
@@ -155,12 +160,30 @@ class _CreateFilmroll extends State<CreateFilmroll> {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          TextField(
-            controller: camera,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              label: Text("Camera")
-            )
+          Autocomplete<String>(
+            optionsBuilder: (TextEditingValue value) {
+              if(value.text.isEmpty) return const Iterable<String>.empty();
+              List<String> suggestions = [];
+              for(String camera in cameraSuggestions) {
+                if(camera.toLowerCase().contains(value.text.toLowerCase())) {
+                  suggestions.add(camera);
+                }
+              }
+              return Iterable<String>.generate(suggestions.length, (int index) {
+                return suggestions[index];
+              });
+            },
+            fieldViewBuilder: (BuildContext context, TextEditingController controller, FocusNode node, Function() fun) {
+              camera = controller;
+              return TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text("Camera")
+                ),
+                focusNode: node,
+                controller: controller,
+              );
+            },
           ),
           const SizedBox(height: 12),
           TextField(
