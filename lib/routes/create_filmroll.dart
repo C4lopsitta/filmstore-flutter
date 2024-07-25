@@ -87,7 +87,11 @@ class _CreateFilmroll extends State<CreateFilmroll> {
     filmStocks = [];
 
     for(FilmStock stock in Api.globalStocks!) {
-      filmStocks.add(DropdownMenuEntry(value: stock.dbId, label: "${stock.name} (ISO ${stock.iso})"));
+      filmStocks.add(DropdownMenuEntry(
+        value: stock.dbId,
+        label: "",
+        labelWidget:stock.toMenuEntry()),
+      );
     }
     setState(() {});
   }

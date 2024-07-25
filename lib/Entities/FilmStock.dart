@@ -88,6 +88,17 @@ class FilmStock{
     );
   }
 
+  Column toMenuEntry() {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(name),
+        Text("ISO $iso    Format ${format.toUserString()}", style: const TextStyle(fontSize: 10))
+      ],
+    );
+  }
 
   Widget build(BuildContext context) {
     return GestureDetector(
