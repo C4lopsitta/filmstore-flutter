@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
   static Set<FilmStock>? globalStocks;
-  static Set<FilmRoll>? globalRolls;
+  static List<FilmRoll>? globalRolls;
 
   /// Queries API and returns a list of Film Stocks
   ///

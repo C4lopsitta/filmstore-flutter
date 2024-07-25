@@ -1,11 +1,14 @@
 import 'package:filmstore/Entities/FilmRoll.dart';
 import 'package:filmstore/api.dart';
+import 'package:filmstore/components/show_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 import '../Entities/FilmStock.dart';
 
 class CreateFilmroll extends StatefulWidget {
+  const CreateFilmroll({super.key});
 
   @override
   State<StatefulWidget> createState() => _CreateFilmroll();
@@ -41,7 +44,31 @@ class _CreateFilmroll extends State<CreateFilmroll> {
 
   Future<void> initStocks() async {
     if(Api.globalStocks?.isEmpty ?? true) {
-      Api.globalStocks = (await Api.getFilmStocks()).toSet();
+      try {
+        Api.globalStocks = (await Api.getFilmStocks()).toSet();
+      } on ApiException catch (ex) {
+        contextualErrorDialogShower(
+          context,
+          const Icon(Icons.error_rounded),
+          const Text("API Error"),
+          Text(ex.apiError)
+        );
+      } on ClientException catch (ex) {
+        contextualErrorDialogShower(
+          context,
+          const Icon(Icons.error_rounded),
+          const Text("API Error"),
+          Text(ex.message),
+          callback: (_) => Navigator.pop(context)
+        );
+      } catch (ex) {
+        contextualErrorDialogShower(
+          context,
+          const Icon(Icons.error_rounded),
+          const Text("API Error"),
+          Text(ex.toString())
+        );
+      }
     }
 
     if(filmStocks.isEmpty) {
@@ -103,16 +130,20 @@ class _CreateFilmroll extends State<CreateFilmroll> {
                   icon: const Icon(Icons.error_rounded),
                   title: const Text("API Error"),
                   content: Text(ex.apiError),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text("Ok")
-                    )
-                  ],
                 );
               });
               }
+          } catch (ex) {
+            if(context.mounted) {
+              showDialog(context: context, builder: (BuildContext context) {
+                return AlertDialog(
+                  icon: const Icon(Icons.error_rounded),
+                  title: const Text("Error"),
+                  content: Text(ex.toString()),
+                );
+              });
             }
+          }
         },
         child: const Icon(Icons.save_rounded),
       ),

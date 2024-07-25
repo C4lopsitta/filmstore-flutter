@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import '../api.dart';
 
 class CreateFilmstock extends StatefulWidget {
+  const CreateFilmstock({super.key});
 
   @override
   State<StatefulWidget> createState() => _CreateFilmstock();

@@ -5,36 +5,37 @@ import '../Entities/FilmStock.dart';
 import '../api.dart';
 
 class Stocks extends StatefulWidget {
-  List<Widget> filmstocks_cards = [];
+  List<Widget> filmStockCards;
   String? error;
   BuildContext? context;
 
+  Stocks(this.filmStockCards, {super.key});
 
-  void getStocks(void Function() update) async {
-    error = null;
-    filmstocks_cards = [];
-    update();
-
-    try {
-      Api.globalStocks = null;
-      Api.getFilmStocks().then((stocks) {
-        if(stocks.isEmpty) error = "No stock available";
-        Api.globalStocks = stocks.toSet();
-
-        for (var stock in stocks) {
-          filmstocks_cards.add(stock.build(context!));
-          filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
-        }
-        update();
-      });
-    } on ApiException catch (ex) {
-      error = ex.apiError;
-    } catch (ex) {
-      error = ex.toString();
-    } finally {
-      update();
-    }
-  }
+  // void getStocks(void Function() update) async {
+  //   error = null;
+  //   filmstocks_cards = [];
+  //   update();
+  //
+  //   try {
+  //     Api.globalStocks = null;
+  //     Api.getFilmStocks().then((stocks) {
+  //       if(stocks.isEmpty) error = "No stock available";
+  //       Api.globalStocks = stocks.toSet();
+  //
+  //       for (var stock in stocks) {
+  //         filmstocks_cards.add(stock.build(context!));
+  //         filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+  //       }
+  //       update();
+  //     });
+  //   } on ApiException catch (ex) {
+  //     error = ex.apiError;
+  //   } catch (ex) {
+  //     error = ex.toString();
+  //   } finally {
+  //     update();
+  //   }
+  // }
 
   @override
   State<StatefulWidget> createState() => _Stocks();
@@ -48,7 +49,7 @@ class _Stocks extends State<Stocks> {
 
   @override
   void didChangeDependencies() {
-    widget.getStocks(() => setState(() {}));
+    // widget.getStocks(() => setState(() {}));
     super.didChangeDependencies();
   }
 
@@ -60,7 +61,8 @@ class _Stocks extends State<Stocks> {
       height: MediaQuery.sizeOf(context).height,
       width: MediaQuery.sizeOf(context).width,
       child: RefreshIndicator(
-        onRefresh: () async => widget.getStocks(() => setState(() {})),
+        // onRefresh: () async => widget.getStocks(() => setState(() {})),
+        onRefresh: () async {},
         child: (widget.error == null) ? SingleChildScrollView(
           child: Column(
           children: <Widget>[
@@ -70,20 +72,20 @@ class _Stocks extends State<Stocks> {
               child: FilterChipRow(
                 filters: const ["All", "B/W Pan", "B/W Ortho", "Color", "Infrared"],
                 onSelected: (int selection, String selected) {
-                  widget.filmstocks_cards = [];
+                  widget.filmStockCards = [];
                   if(selection == 0) {
                     for (FilmStock stock in Api.globalStocks ?? []) {
-                      widget.filmstocks_cards.add(stock.build(context));
-                      widget.filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+                      widget.filmStockCards.add(stock.build(context));
+                      widget.filmStockCards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
                     }
                   } else {
                     for (FilmStock stock in Api.globalStocks ?? [])
                       if (stock.type == FilmType.values[selection]) {
-                        widget.filmstocks_cards.add(stock.build(context));
-                        widget.filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
+                        widget.filmStockCards.add(stock.build(context));
+                        widget.filmStockCards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
                       }
-                    if(widget.filmstocks_cards.isEmpty)
-                      widget.filmstocks_cards.add(SizedBox(
+                    if(widget.filmStockCards.isEmpty)
+                      widget.filmStockCards.add(SizedBox(
                         width: MediaQuery.sizeOf(context).width,
                         height: MediaQuery.sizeOf(context).height - 140,
                         child: Center(
@@ -95,7 +97,7 @@ class _Stocks extends State<Stocks> {
                 },
               )
             )
-          ] + widget.filmstocks_cards,
+          ] + widget.filmStockCards,
         )) : Column(
           children: [
             SizedBox(height: MediaQuery.of(context).viewPadding.top),
