@@ -104,19 +104,39 @@ class _ApplicationRoot extends State<ApplicationRoot> {
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: (currentPageIndex == 0) ?
-        FloatingActionButton.extended(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CreateFilmroll())).then((value) async {
-                  await fetchRolls();
-                  setState(() {});
-              });
-            },
-            tooltip: "Create film roll",
-            icon: const Icon(Icons.add_rounded),
-            label: const Text("New Film Roll")
-        ) : (currentPageIndex == 1) ?
+        SizedBox(
+          height: MediaQuery.sizeOf(context).height * 0.15,
+          width: MediaQuery.sizeOf(context).width * 0.15,
+          child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: FloatingActionButton.small(
+                    onPressed: () {},
+                    child: const Icon(Icons.search_rounded),
+                    heroTag: "Search",
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CreateFilmroll())).then((value) async {
+                          await fetchRolls();
+                          setState(() {});
+                        });
+                    },
+                    tooltip: "Create film roll",
+                    child: const Icon(Icons.add_rounded),
+                  )
+                )
+              ]
+            )
+        )
+         : (currentPageIndex == 1) ?
         FloatingActionButton.extended(
             onPressed: () {
               Navigator.push(

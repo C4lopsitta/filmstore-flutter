@@ -26,15 +26,6 @@ class _FilmStockDetails extends State<FilmStockDetails> {
       return Scaffold(
         appBar: AppBar(
           title: Text(widget.stock.name),
-          actions: [
-            IconButton(
-              onPressed: () {
-                // TODO))
-              },
-              icon: const Icon(Icons.edit_rounded),
-              tooltip: "Edit",
-            )
-          ],
         ),
         body: Column(
           children: [
