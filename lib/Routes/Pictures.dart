@@ -22,7 +22,7 @@ class _Pictures extends State<Pictures> {
             children: [
               SizedBox(height: MediaQuery.of(context).viewPadding.top),
               const Center(
-                child: Text("Future addition as API currently does not support feature")
+                child: Text("")
               )
             ],
           )

@@ -140,7 +140,15 @@ class _UploadPhoto extends State<UploadPhoto> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-
+          if(image == null) return;
+          await Api.uploadImage(image!, {
+            "description": desc.text,
+            "aperture": aperture.text,
+            "shutter_speed": shutterSpeed.text,
+            "location": location.text,
+            "posted": false,
+            "printed": false
+          });
         },
         child: const Icon(Icons.save_rounded),
       ),

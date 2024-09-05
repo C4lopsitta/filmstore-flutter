@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart' as path;
+import 'package:http_parser/http_parser.dart';
 
 import 'package:filmstore/Entities/FilmStock.dart';
 import 'package:filmstore/Entities/FilmRoll.dart';
@@ -108,6 +111,32 @@ class Api {
     if(response.statusCode >= 200 && response.statusCode < 300) return true;
     Map<String, dynamic> json = jsonDecode(response.body);
     throw ApiException(statusCode: response.statusCode, apiError: json["message"] ?? "Something really weird just happened");
+  }
+
+  static Future<bool> uploadImage(File image, Map<String, dynamic> json) async {
+    http.MultipartRequest request = http.MultipartRequest(
+      'POST',
+      await buildUri("/api/v1/pictures")
+    );
+
+    request.fields["req"] = jsonEncode(json);
+    http.MultipartFile multiFile = http.MultipartFile(
+      'file',
+      http.ByteStream(image.openRead()),
+      await image.length(),
+      filename: path.basename(image.path),
+      contentType: MediaType.parse((path.extension(image.path) == "png") ? 'image/png' : 'image/jpeg')
+    );
+    request.files.add(multiFile);
+
+    http.StreamedResponse response = await request.send();
+
+    if(response.statusCode >= 200 && response.statusCode < 300) {
+      return true;
+    }
+
+    Map<String, dynamic> responseJson = jsonDecode((await response.stream.toBytes()).toString());
+    throw ApiException(statusCode: response.statusCode, apiError: responseJson["error"]);
   }
 
   /// Checks if API returns a 200.
