@@ -4,11 +4,36 @@ import 'package:filmstore/Entities/FilmStock.dart';
 import 'package:filmstore/Entities/FilmRoll.dart';
 import 'package:filmstore/preferences_keys.dart';
 import 'package:http/http.dart' as http;
+import 'package:multicast_dns/multicast_dns.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
   static Set<FilmStock>? globalStocks;
   static List<FilmRoll>? globalRolls;
+  static String _mdsn_discovery_name = "_filmstore-api._tcp.local";
+
+  static Future<void> discoverApi() async {
+    final mdnsClient = MDnsClient();
+    await mdnsClient.start();
+
+    await for (final PtrResourceRecord ptr in mdnsClient
+        .lookup<PtrResourceRecord>(ResourceRecordQuery.serverPointer(_mdsn_discovery_name))) {
+      await for (final SrvResourceRecord srv in mdnsClient.lookup<SrvResourceRecord>(
+          ResourceRecordQuery.service(ptr.domainName))) {
+        print('Filmstore API instance found at '
+            '${srv.target}:${srv.port}".');
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        bool useDiscovery = preferences.getBool(PreferencesKeys.useDiscovery) ?? true;
+
+        if(useDiscovery) {
+          preferences.setString(PreferencesKeys.address, "http://${srv.target}:${srv.port}");
+        }
+
+      }
+    }
+
+    mdnsClient.stop();
+  }
 
   /// Queries API and returns a list of Film Stocks
   ///

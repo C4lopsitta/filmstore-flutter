@@ -47,13 +47,14 @@ class _ApplicationRoot extends State<ApplicationRoot> {
 
   @override
   void initState() {
-    super.initState();
-
     fetchData();
+    super.initState();
   }
 
+  int lastPanTimestamp = 0;
 
   Future<void> fetchRolls() async {
+    Api.globalRolls = [];
     Api.globalRolls = await Api.getFilmRolls();
 
     for(FilmRoll roll in Api.globalRolls!) {
@@ -63,6 +64,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
   }
 
   Future<void> fetchStocks() async {
+      Api.globalStocks = <FilmStock>{};
       Api.globalStocks = (await Api.getFilmStocks()).toSet();
 
       for(FilmStock stock in Api.globalStocks!) {
@@ -73,6 +75,9 @@ class _ApplicationRoot extends State<ApplicationRoot> {
 
   void fetchData() async {
     try {
+      await Api.discoverApi();
+      filmRollCards = [];
+      filmStockCards = [];
       await fetchRolls();
       await fetchStocks();
       setState(() {});
@@ -114,8 +119,8 @@ class _ApplicationRoot extends State<ApplicationRoot> {
                   alignment: Alignment.topCenter,
                   child: FloatingActionButton.small(
                     onPressed: () {},
-                    child: const Icon(Icons.search_rounded),
                     heroTag: "Search",
+                    child: const Icon(Icons.search_rounded),
                   ),
                 ),
                 Align(
@@ -125,6 +130,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => CreateFilmroll())).then((value) async {
+                          filmRollCards = [];
                           await fetchRolls();
                           setState(() {});
                         });
@@ -142,6 +148,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
               Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => CreateFilmstock())).then((value) async {
+                    filmStockCards = [];
                     await fetchStocks();
                     setState(() {});
               });
@@ -158,7 +165,6 @@ class _ApplicationRoot extends State<ApplicationRoot> {
         ][currentPageIndex],
 
         bottomNavigationBar: GestureDetector(
-
           child: NavigationBar(
             onDestinationSelected: (int index) { setState((){ currentPageIndex = index; }); },
             selectedIndex: currentPageIndex,

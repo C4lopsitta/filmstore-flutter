@@ -11,32 +11,6 @@ class Stocks extends StatefulWidget {
 
   Stocks(this.filmStockCards, {super.key});
 
-  // void getStocks(void Function() update) async {
-  //   error = null;
-  //   filmstocks_cards = [];
-  //   update();
-  //
-  //   try {
-  //     Api.globalStocks = null;
-  //     Api.getFilmStocks().then((stocks) {
-  //       if(stocks.isEmpty) error = "No stock available";
-  //       Api.globalStocks = stocks.toSet();
-  //
-  //       for (var stock in stocks) {
-  //         filmstocks_cards.add(stock.build(context!));
-  //         filmstocks_cards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
-  //       }
-  //       update();
-  //     });
-  //   } on ApiException catch (ex) {
-  //     error = ex.apiError;
-  //   } catch (ex) {
-  //     error = ex.toString();
-  //   } finally {
-  //     update();
-  //   }
-  // }
-
   @override
   State<StatefulWidget> createState() => _Stocks();
 }
@@ -49,7 +23,6 @@ class _Stocks extends State<Stocks> {
 
   @override
   void didChangeDependencies() {
-    // widget.getStocks(() => setState(() {}));
     super.didChangeDependencies();
   }
 
@@ -79,19 +52,21 @@ class _Stocks extends State<Stocks> {
                       widget.filmStockCards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
                     }
                   } else {
-                    for (FilmStock stock in Api.globalStocks ?? [])
+                    for (FilmStock stock in Api.globalStocks ?? []) {
                       if (stock.type == FilmType.values[selection]) {
                         widget.filmStockCards.add(stock.build(context));
                         widget.filmStockCards.add(const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Divider()));
                       }
-                    if(widget.filmStockCards.isEmpty)
+                    }
+                    if(widget.filmStockCards.isEmpty) {
                       widget.filmStockCards.add(SizedBox(
                         width: MediaQuery.sizeOf(context).width,
                         height: MediaQuery.sizeOf(context).height - 140,
                         child: Center(
-                          child: Text("No Stock with this type")
+                          child: Text((selection == 0) ? "No Stock on Database" : "No Stock with this type")
                         )
                       ));
+                    }
                   }
                   setState(() {});
                 },

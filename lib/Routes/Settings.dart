@@ -30,10 +30,13 @@ class _Settings extends State<Settings> {
     preferences = await SharedPreferences.getInstance();
 
     addressController.text = preferences?.getString(PreferencesKeys.address) ?? "";
+    useDiscovery = preferences?.getBool(PreferencesKeys.useDiscovery) ?? true;
     setState(() {});
   }
 
   bool authEnabled = false;
+  bool useDiscovery = false;
+  bool discoveringService = false;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +56,7 @@ class _Settings extends State<Settings> {
               hintText: "Include http:// or https:// and port",
               error: addressError,
             ),
+            enabled: !useDiscovery,
             onSubmitted: (String newValue) async {
               if(preferences != null) {
                 newValue.replaceAll(RegExp(r"/$"), '');
@@ -72,6 +76,38 @@ class _Settings extends State<Settings> {
                 }
               }
             },
+          ),
+          const SizedBox(height: 12),
+          CheckboxListTile(
+              title: const Text("Use automatic discovery"),
+              subtitle: const Text("Use an mDNS query for FilmStore API to automatically set the address."),
+              value: useDiscovery,
+              onChanged: (bool? newValue) {
+                preferences?.setBool(PreferencesKeys.useDiscovery, newValue ?? true);
+                useDiscovery = !useDiscovery;
+                setState(() {});
+              }
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: MediaQuery.sizeOf(context).width,
+            child: OutlinedButton(
+              onPressed: (useDiscovery) ? () async {
+                discoveringService = true;
+                setState(() {});
+                await Api.discoverApi();
+                addressController.text = preferences?.getString(PreferencesKeys.address) ?? "";
+                addressError = null;
+                discoveringService = false;
+                setState(() {});
+              } : null,
+              child: (discoveringService) ? const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(),
+                ) :
+                const Text("Discover service")
+            )
           ),
           const SizedBox(height: 12),
           CheckboxListTile(
