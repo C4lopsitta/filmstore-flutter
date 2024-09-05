@@ -4,6 +4,7 @@ import 'package:filmstore/Routes/Settings.dart';
 import 'package:filmstore/components/show_dialog.dart';
 import 'package:filmstore/routes/create_filmroll.dart';
 import 'package:filmstore/routes/create_filmstock.dart';
+import 'package:filmstore/routes/upload_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -147,7 +148,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
             onPressed: () {
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateFilmstock())).then((value) async {
+                  MaterialPageRoute(builder: (context) => const CreateFilmstock())).then((value) async {
                     filmStockCards = [];
                     await fetchStocks();
                     setState(() {});
@@ -156,6 +157,17 @@ class _ApplicationRoot extends State<ApplicationRoot> {
             tooltip: "Add new stock",
             icon: const Icon(Icons.add_rounded),
             label: const Text("New Stock"),
+        ) : (currentPageIndex == 2) ? FloatingActionButton.extended(
+            onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UploadPhoto())).then((value) async {
+                    // TODO))
+                  });
+            },
+          tooltip: "Upload a photo",
+          icon: const Icon(Icons.upload_rounded),
+          label: const Text("Upload Photo"),
         ) : null,
         body: [
           Rolls(filmRollCards),
