@@ -1,4 +1,5 @@
 import 'package:filmstore/routes/details_filmstock.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 enum FilmType {

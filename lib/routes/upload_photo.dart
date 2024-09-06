@@ -140,6 +140,7 @@ class _UploadPhoto extends State<UploadPhoto> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          // TODO)) TODO)) TODO)) ADD ERROR CHECK AND TEXT CHECK
           if(image == null) return;
           await Api.uploadImage(image!, {
             "description": desc.text,

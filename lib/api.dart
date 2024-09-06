@@ -15,6 +15,7 @@ class Api {
   static List<FilmRoll>? globalRolls;
   static String _mdsn_discovery_name = "_filmstore-api._tcp.local";
 
+  /// mDNS API Discovery service
   static Future<void> discoverApi() async {
     final mdnsClient = MDnsClient();
     await mdnsClient.start();
@@ -52,7 +53,7 @@ class Api {
     if (response.statusCode < 200 || response.statusCode > 300) {
       throw ApiException(
           statusCode: response.statusCode,
-          apiError: json["message"]
+          apiError: json["error"]
       );
     }
 
@@ -73,16 +74,16 @@ class Api {
     return false;
   }
 
-  static Future<List<FilmRoll>> getFilmRolls() async {
+  static Future<List<FilmRoll>> getFilmRolls({int stockFilter = 0}) async {
     List<FilmRoll> rolls = [];
-    Uri uri = await buildUri("/api/v1/filmrolls");
+    Uri uri = await buildUri("/api/v1/filmrolls?stock=$stockFilter");
 
     http.Response response = await http.get(uri);
 
     Map<String, dynamic> json = jsonDecode(response.body);
 
     if(response.statusCode < 200 || response.statusCode > 300) {
-      throw ApiException(statusCode: response.statusCode, apiError: json["message"]);
+      throw ApiException(statusCode: response.statusCode, apiError: json["error"]);
     }
 
     List<dynamic> filmRolls = json["filmrolls"];
@@ -110,10 +111,10 @@ class Api {
 
     if(response.statusCode >= 200 && response.statusCode < 300) return true;
     Map<String, dynamic> json = jsonDecode(response.body);
-    throw ApiException(statusCode: response.statusCode, apiError: json["message"] ?? "Something really weird just happened");
+    throw ApiException(statusCode: response.statusCode, apiError: json["error"] ?? "Something really weird just happened");
   }
 
-  static Future<bool> uploadImage(File image, Map<String, dynamic> json) async {
+  static Future<Map<String, dynamic>> uploadImage(File image, Map<String, dynamic> json) async {
     http.MultipartRequest request = http.MultipartRequest(
       'POST',
       await buildUri("/api/v1/pictures")
@@ -131,11 +132,12 @@ class Api {
 
     http.StreamedResponse response = await request.send();
 
+    Map<String, dynamic> responseJson = jsonDecode((await response.stream.toBytes()).toString());
+
     if(response.statusCode >= 200 && response.statusCode < 300) {
-      return true;
+      return responseJson;
     }
 
-    Map<String, dynamic> responseJson = jsonDecode((await response.stream.toBytes()).toString());
     throw ApiException(statusCode: response.statusCode, apiError: responseJson["error"]);
   }
 
