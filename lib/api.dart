@@ -10,9 +10,12 @@ import 'package:http/http.dart' as http;
 import 'package:multicast_dns/multicast_dns.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Entities/ApiPicture.dart';
+
 class Api {
   static Set<FilmStock>? globalStocks;
   static List<FilmRoll>? globalRolls;
+  static List<ApiPicture>? globalPictures;
   static String _mdsn_discovery_name = "_filmstore-api._tcp.local";
 
   /// mDNS API Discovery service
@@ -39,6 +42,7 @@ class Api {
     mdnsClient.stop();
   }
 
+  //works
   /// Queries API and returns a list of Film Stocks
   ///
   /// Raises a [ApiException] if an issue is encountered.
@@ -74,6 +78,7 @@ class Api {
     return false;
   }
 
+  //works
   static Future<List<FilmRoll>> getFilmRolls({int stockFilter = 0}) async {
     List<FilmRoll> rolls = [];
     Uri uri = await buildUri("/api/v1/filmrolls?stock=$stockFilter");
@@ -94,6 +99,7 @@ class Api {
     return rolls;
   }
 
+  // todo)) fix
   static Future<bool> createFilmRoll(FilmRoll roll) async {
     http.Response response = await http.post(
       await buildUri("/api/v1/filmrolls"),
@@ -141,6 +147,36 @@ class Api {
     throw ApiException(statusCode: response.statusCode, apiError: responseJson["error"]);
   }
 
+
+  // fully updated
+  static Future<List<ApiPicture>> getPictures() async {
+    List<ApiPicture> pictures = [];
+
+    Uri uri = await buildUri("/api/v1/pictures");
+
+    http.Response response = await http.get(uri);
+
+    Map<String, dynamic> responseJson = jsonDecode(response.body);
+
+    if(response.statusCode > 300 || response.statusCode < 200) {
+      throw ApiException(statusCode: response.statusCode, apiError: responseJson["error"]);
+    }
+
+    List<dynamic> jsonPictures = responseJson["pictures"];
+    jsonPictures.forEach((picture) {
+      pictures.add(ApiPicture.fromJson(picture));
+    });
+
+    return pictures;
+  }
+
+  // static Future<File> getPictureFile(String filename) async {
+  //   Uri uri = await buildUri("/api/v1/pictures/file/$filename");
+  //
+  //
+  // }
+
+  // works
   /// Checks if API returns a 200.
   /// 
   /// Raises an [ApiException] when the API does not return 200.

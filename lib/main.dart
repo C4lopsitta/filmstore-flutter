@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:filmstore/Entities/ApiPicture.dart';
 import 'package:filmstore/Routes/Settings.dart';
+import 'package:filmstore/components/picture_square.dart';
 import 'package:filmstore/components/show_dialog.dart';
 import 'package:filmstore/routes/create_filmroll.dart';
 import 'package:filmstore/routes/create_filmstock.dart';
@@ -45,6 +47,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
   int currentPageIndex = 0;
   List<Widget> filmRollCards = [];
   List<Widget> filmStockCards = [];
+  List<PictureSquare> pictureCards = [];
 
   @override
   void initState() {
@@ -74,13 +77,24 @@ class _ApplicationRoot extends State<ApplicationRoot> {
       }
   }
 
+  Future<void> fetchPictures() async {
+    Api.globalPictures = [];
+    Api.globalPictures = await Api.getPictures();
+
+    for(ApiPicture picture in Api.globalPictures!) {
+      pictureCards.add(PictureSquare(picture));
+    }
+  }
+
   void fetchData() async {
     try {
       await Api.discoverApi();
       filmRollCards = [];
       filmStockCards = [];
+      pictureCards = [];
       await fetchRolls();
       await fetchStocks();
+      await fetchPictures();
       setState(() {});
     } on ApiException catch (ex) {
       contextualErrorDialogShower(
@@ -162,7 +176,9 @@ class _ApplicationRoot extends State<ApplicationRoot> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const UploadPhoto())).then((value) async {
-                    // TODO))
+                    pictureCards = [];
+                    await fetchPictures();
+                    setState(() {});
                   });
             },
           tooltip: "Upload a photo",
@@ -172,7 +188,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
         body: [
           Rolls(filmRollCards),
           Stocks(filmStockCards),
-          Pictures(),
+          Pictures(pictureCards),
           const Settings()
         ][currentPageIndex],
 
