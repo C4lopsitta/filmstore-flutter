@@ -161,8 +161,8 @@ class _Settings extends State<Settings> {
               keyboardType: TextInputType.number,
               // TODO)) Add integer verification
               decoration: const InputDecoration(
-                border: const OutlineInputBorder(),
-                label: const Text("Columns"),
+                border: OutlineInputBorder(),
+                label: Text("Columns"),
                 hintText: "3",
               ),
               onSubmitted: (String newValue) async {

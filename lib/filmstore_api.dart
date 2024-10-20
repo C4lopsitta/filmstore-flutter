@@ -140,9 +140,9 @@ class Api {
     List<FilmStock> stocks = [];
     Uri uri = await buildUri("/api/v1/films");
 
-    base_http.Response response = await base_http.get(uri);
+    HttpClientResponse response = await getRequest(uri);
 
-    Map<String, dynamic> json = jsonDecode(response.body);
+    Map<String, dynamic> json = jsonDecode(await response.transform(utf8.decoder).join());
 
     if (response.statusCode < 200 || response.statusCode > 300) {
       throw ApiException(
@@ -167,9 +167,9 @@ class Api {
     List<FilmRoll> rolls = [];
     Uri uri = await buildUri("/api/v1/filmrolls?stock=$stockFilter");
 
-    base_http.Response response = await base_http.get(uri);
+    HttpClientResponse response = await getRequest(uri);
 
-    Map<String, dynamic> json = jsonDecode(response.body);
+    Map<String, dynamic> json = jsonDecode(await response.transform(utf8.decoder).join());
 
     if(response.statusCode < 200 || response.statusCode > 300) {
       throw ApiException(statusCode: response.statusCode, apiError: json["error"]);
@@ -185,9 +185,9 @@ class Api {
 
   // todo)) fix
   static Future<bool> createFilmRoll(FilmRoll roll) async {
-    base_http.Response response = await base_http.post(
+    HttpClientResponse response = await postRequest(
       await buildUri("/api/v1/filmrolls"),
-      body: """
+      """
       {
         "camera": "${roll.camera}",
         "film": ${roll.film.dbId},
@@ -196,11 +196,10 @@ class Api {
         "status": ${roll.status.index}
       }
       """,
-      encoding: utf8
     );
 
     if(response.statusCode >= 200 && response.statusCode < 300) return true;
-    Map<String, dynamic> json = jsonDecode(response.body);
+    Map<String, dynamic> json = jsonDecode(await response.transform(utf8.decoder).join());
     throw ApiException(statusCode: response.statusCode, apiError: json["error"] ?? "Something really weird just happened");
   }
 
@@ -238,9 +237,9 @@ class Api {
 
     Uri uri = await buildUri("/api/v1/pictures");
 
-    base_http.Response response = await base_http.get(uri);
+    HttpClientResponse response = await getRequest(uri);
 
-    Map<String, dynamic> responseJson = jsonDecode(response.body);
+    Map<String, dynamic> responseJson = jsonDecode(await response.transform(utf8.decoder).join());
 
     if(response.statusCode > 300 || response.statusCode < 200) {
       throw ApiException(statusCode: response.statusCode, apiError: responseJson["error"]);
