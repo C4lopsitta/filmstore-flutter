@@ -3,7 +3,7 @@ import 'package:filmstore/preferences_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../api.dart';
+import '../filmstore_api.dart';
 
 class Pictures extends StatefulWidget {
   Pictures(this.pictureCards, {super.key});

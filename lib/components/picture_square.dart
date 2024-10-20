@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
-import '../api.dart';
+import '../filmstore_api.dart';
 
 class PictureSquare extends StatefulWidget {
   const PictureSquare(this.picture ,{super.key});

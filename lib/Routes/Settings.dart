@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../api.dart';
+import '../filmstore_api.dart';
 
 
 class Settings extends StatefulWidget {
@@ -159,11 +159,11 @@ class _Settings extends State<Settings> {
             TextField(
               controller: preferredColumnsController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              // TODO)) Add integer verification
+              decoration: const InputDecoration(
                 border: const OutlineInputBorder(),
                 label: const Text("Columns"),
                 hintText: "3",
-                error: addressError,
               ),
               onSubmitted: (String newValue) async {
                 if(preferences != null) {

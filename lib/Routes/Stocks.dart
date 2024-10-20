@@ -2,7 +2,7 @@ import 'package:filmstore/components/filter_chip_row.dart';
 import 'package:flutter/material.dart';
 
 import '../Entities/FilmStock.dart';
-import '../api.dart';
+import '../filmstore_api.dart';
 
 class Stocks extends StatefulWidget {
   List<Widget> filmStockCards;

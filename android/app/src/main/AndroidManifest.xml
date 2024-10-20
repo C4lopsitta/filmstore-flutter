@@ -12,6 +12,7 @@
     <!-- Required for accessing photos from the gallery -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES " />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:label="Filmstore"

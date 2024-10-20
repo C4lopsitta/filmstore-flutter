@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:filmstore/keychain/helper.dart';
 import 'package:path/path.dart' as path;
 import 'package:http_parser/http_parser.dart';
 
 import 'package:filmstore/Entities/FilmStock.dart';
 import 'package:filmstore/Entities/FilmRoll.dart';
 import 'package:filmstore/preferences_keys.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as base_http;
 import 'package:multicast_dns/multicast_dns.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,6 +18,95 @@ class Api {
   static List<FilmRoll>? globalRolls;
   static List<ApiPicture>? globalPictures;
   static String _mdsn_discovery_name = "_filmstore-api._tcp.local";
+
+  static HttpClient http = HttpClient();
+
+  static Future<void> setupCertificatedHttpClient() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    if(preferences.getString(PreferencesKeys.userMTLSCertificate) != null) {
+      SecurityContext context = SecurityContext();
+      context.usePrivateKey(preferences.getString(PreferencesKeys.userMTLSCertificate)!);
+
+      http = HttpClient(context: context);
+    }
+  }
+
+  static Future<HttpClientResponse> getRequest(Uri uri) async {
+    try {
+      HttpClientRequest request = await http.getUrl(uri);
+      return await request.close();
+    } catch (e) {
+      print('Error during GET request: $e');
+      rethrow; // Optional: rethrow to handle it elsewhere
+    }
+  }
+
+  static Future<HttpClientResponse> postRequest(Uri uri, dynamic body) async {
+    try {
+      HttpClientRequest request = await http.postUrl(uri);
+      if (body != null) {
+        request.headers.contentType = ContentType.json;
+        request.write(json.encode(body));
+      }
+      return await request.close();
+    } catch (e) {
+      print('Error during POST request: $e');
+      rethrow; // Optional: rethrow to handle it elsewhere
+    }
+  }
+
+  static Future<String> handleSocketOrHandshakeException(SocketException? e, HandshakeException? ex) async {
+    // The API seems up but it requires mTLS to be used.
+    if(e != null) {
+      if (e.message.contains('CERTIFICATE_VERIFY_FAILED') ||
+          e.message.contains('HandshakeException')) {
+        String? cert = await KeychainHelper.getCertificateFromKeychain();
+        if (cert == null) {
+          throw ApiException(statusCode: 600,
+              apiError: "No certificate was selected. API requires mTLS certification to be used.");
+        }
+        return cert;
+      }
+    } else {
+      String? cert = await KeychainHelper.getCertificateFromKeychain();
+      if (cert == null) {
+        throw ApiException(statusCode: 600,
+            apiError: "No certificate was selected. API requires mTLS certification to be used.");
+      }
+      return cert;
+    }
+    throw Exception("No certificate needed");
+  }
+
+  static Future<bool> testApiAddress() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await setupCertificatedHttpClient();
+
+    try {
+      HttpClientResponse response = await getRequest(await buildUri("/api/v1"));
+
+      if(response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } on SocketException catch (e) {
+      String cert = await handleSocketOrHandshakeException(e, null);
+      preferences.setString(PreferencesKeys.userMTLSCertificate, cert);
+      return testApiAddress();
+    } on HandshakeException catch (e) {
+      String cert = await handleSocketOrHandshakeException(null, e);
+      preferences.setString(PreferencesKeys.userMTLSCertificate, cert);
+      return testApiAddress();
+    } on ApiException catch (e) {
+      rethrow;
+    } catch (e) {
+      print(e.runtimeType);
+      print(e.toString());
+    }
+    return false;
+  }
 
   /// mDNS API Discovery service
   static Future<void> discoverApi() async {
@@ -50,7 +140,7 @@ class Api {
     List<FilmStock> stocks = [];
     Uri uri = await buildUri("/api/v1/films");
 
-    http.Response response = await http.get(uri);
+    base_http.Response response = await base_http.get(uri);
 
     Map<String, dynamic> json = jsonDecode(response.body);
 
@@ -71,19 +161,13 @@ class Api {
     return stocks;
   }
 
-  static Future<bool> testApiAddress() async {
-    http.Response response = await http.get(await buildUri("/api/v1"));
-
-    if(response.statusCode == 200) return true;
-    return false;
-  }
 
   //works
   static Future<List<FilmRoll>> getFilmRolls({int stockFilter = 0}) async {
     List<FilmRoll> rolls = [];
     Uri uri = await buildUri("/api/v1/filmrolls?stock=$stockFilter");
 
-    http.Response response = await http.get(uri);
+    base_http.Response response = await base_http.get(uri);
 
     Map<String, dynamic> json = jsonDecode(response.body);
 
@@ -101,7 +185,7 @@ class Api {
 
   // todo)) fix
   static Future<bool> createFilmRoll(FilmRoll roll) async {
-    http.Response response = await http.post(
+    base_http.Response response = await base_http.post(
       await buildUri("/api/v1/filmrolls"),
       body: """
       {
@@ -121,22 +205,22 @@ class Api {
   }
 
   static Future<Map<String, dynamic>> uploadImage(File image, Map<String, dynamic> json) async {
-    http.MultipartRequest request = http.MultipartRequest(
+    base_http.MultipartRequest request = base_http.MultipartRequest(
       'POST',
       await buildUri("/api/v1/pictures")
     );
 
     request.fields["req"] = jsonEncode(json);
-    http.MultipartFile multiFile = http.MultipartFile(
+    base_http.MultipartFile multiFile = base_http.MultipartFile(
       'file',
-      http.ByteStream(image.openRead()),
+      base_http.ByteStream(image.openRead()),
       await image.length(),
       filename: path.basename(image.path),
       contentType: MediaType.parse((path.extension(image.path) == "png") ? 'image/png' : 'image/jpeg')
     );
     request.files.add(multiFile);
 
-    http.StreamedResponse response = await request.send();
+    base_http.StreamedResponse response = await request.send();
 
     Map<String, dynamic> responseJson = jsonDecode((await response.stream.toBytes()).toString());
 
@@ -154,7 +238,7 @@ class Api {
 
     Uri uri = await buildUri("/api/v1/pictures");
 
-    http.Response response = await http.get(uri);
+    base_http.Response response = await base_http.get(uri);
 
     Map<String, dynamic> responseJson = jsonDecode(response.body);
 
